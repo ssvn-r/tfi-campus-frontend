@@ -355,10 +355,8 @@ export const rechazarMaterial = (id, motivo) =>
 export const marcarFavoritoBiblioteca = (id, puesto) =>
   puesto ? enviar(`/biblioteca/${idEnRuta(id)}/favorito`, {}) : borrar(`/biblioteca/${idEnRuta(id)}/favorito`);
 
-export async function descargarMaterial(id, nombre) {
-  const respuesta = await fetch(`${API}/biblioteca/${idEnRuta(id)}/archivo`, {
-    headers: await cabeceras(),
-  });
+async function descargar(url, nombre) {
+  const respuesta = await fetch(url, { headers: await cabeceras() });
   if (!respuesta.ok) return responderOFallar(respuesta, 'descargar el archivo');
 
   const direccion = URL.createObjectURL(await respuesta.blob());
@@ -371,6 +369,9 @@ export async function descargarMaterial(id, nombre) {
   enlace.remove();
   setTimeout(() => URL.revokeObjectURL(direccion), 1000);
 }
+
+export const descargarMaterial = (id, nombre) =>
+  descargar(`${API}/biblioteca/${idEnRuta(id)}/archivo`, nombre);
 
 // El archivo viaja en base64 dentro del JSON. Es lo que se puede hacer sin
 // Firebase Storage; cuando esté, sube al bucket y acá queda la referencia.
@@ -547,8 +548,11 @@ export const subirArchivoDeElemento = (idCurso, idSeccion, idItem, archivo, alAv
     alAvanzar
   );
 
-export const enlaceArchivoDeElemento = (idCurso, idSeccion, idItem) =>
-  `${API}/cursos/${idCurso}/carpetas/${idSeccion}/items/${idEnRuta(idItem)}/archivo`;
+export const descargarArchivoDeElemento = (idCurso, idSeccion, idItem, nombre) =>
+  descargar(
+    `${API}/cursos/${idCurso}/carpetas/${idSeccion}/items/${idEnRuta(idItem)}/archivo`,
+    nombre
+  );
 
 // --- Días de cursada de un módulo ---
 export const agregarDiaDeClase = (idCurso, datos) =>

@@ -9,7 +9,7 @@ import {
   IconoSubir,
 } from './Iconos.jsx';
 import {
-  enlaceArchivoDeElemento,
+  descargarArchivoDeElemento,
   obtenerMiEntrega,
   obtenerEntregasDeTarea,
   publicarEnTablero,
@@ -60,7 +60,9 @@ function Archivo({ curso, carpeta, item }) {
   // Los archivos subidos antes de que existiera la firma no la tienen: ahí no
   // se ofrece vista previa, solo la descarga, que sí lleva la sesión.
   const seVe = sePuedeVer(subido);
-  const paraBajar = subido ? enlaceArchivoDeElemento(curso.id, carpeta.id, item.id) : null;
+  const paraBajar = subido
+    ? () => descargarArchivoDeElemento(curso.id, carpeta.id, item.id, subido.nombre)
+    : null;
 
   return (
     <div className="visor-archivo">
@@ -83,10 +85,14 @@ function Archivo({ curso, carpeta, item }) {
       {/* Cuando se puede mirar, el visor ya trae su propio Descargar, pegado
           al borde del documento. */}
       {subido && !seVe && (
-        <a className="boton-principal" href={paraBajar} download={subido.nombre}>
+        <button
+          type="button"
+          className="boton-principal"
+          onClick={() => paraBajar().catch((e) => avisar(e.message, 'error'))}
+        >
           <IconoDescargar />
           Descargar
-        </a>
+        </button>
       )}
     </div>
   );

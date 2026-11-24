@@ -27,6 +27,7 @@ import {
   IconoPantallaCompleta,
   IconoSalirPantallaCompleta,
 } from './Iconos.jsx';
+import { avisar } from '../services/avisos.js';
 
 // pdf.js y mammoth pesan más que todo el resto del campus junto, y la mayoría
 // de las pantallas no abren un documento nunca. Se piden al abrir el primero:
@@ -340,10 +341,14 @@ export default function VisorDocumento({ archivo, descarga }) {
             </button>
           )}
           {descarga && (
-            <a className="documento-accion" href={descarga} download={archivo.nombre}>
+            <button
+              type="button"
+              className="documento-accion"
+              onClick={() => descarga().catch((e) => avisar(e.message, 'error'))}
+            >
               <IconoDescargar width={15} height={15} />
               <span>Descargar</span>
-            </a>
+            </button>
           )}
           <button
             type="button"
