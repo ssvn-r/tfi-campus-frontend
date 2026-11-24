@@ -355,9 +355,22 @@ export const rechazarMaterial = (id, motivo) =>
 export const marcarFavoritoBiblioteca = (id, puesto) =>
   puesto ? enviar(`/biblioteca/${idEnRuta(id)}/favorito`, {}) : borrar(`/biblioteca/${idEnRuta(id)}/favorito`);
 
-// La dirección de descarga: el navegador la abre, el backend comprueba los
-// permisos y manda el archivo.
-export const enlaceDescarga = (id) => `${API}/biblioteca/${idEnRuta(id)}/archivo`;
+export async function descargarMaterial(id, nombre) {
+  const respuesta = await fetch(`${API}/biblioteca/${idEnRuta(id)}/archivo`, {
+    headers: await cabeceras(),
+  });
+  if (!respuesta.ok) return responderOFallar(respuesta, 'descargar el archivo');
+
+  const direccion = URL.createObjectURL(await respuesta.blob());
+  const enlace = document.createElement('a');
+  enlace.href = direccion;
+  enlace.download = nombre || 'material';
+  enlace.hidden = true;
+  document.body.append(enlace);
+  enlace.click();
+  enlace.remove();
+  setTimeout(() => URL.revokeObjectURL(direccion), 1000);
+}
 
 // El archivo viaja en base64 dentro del JSON. Es lo que se puede hacer sin
 // Firebase Storage; cuando esté, sube al bucket y acá queda la referencia.

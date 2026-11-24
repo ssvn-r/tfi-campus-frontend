@@ -4905,6 +4905,26 @@ a.proxima:hover {
   max-width: 70ch;
 }
 
+.biblioteca-archivo {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--principal);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.biblioteca-archivo:hover {
+  color: var(--tinta);
+}
+
+.biblioteca-archivo:focus-visible {
+  outline: 2px solid var(--principal);
+  outline-offset: 2px;
+}
+
 .biblioteca-aviso {
   padding: 10px 16px;
   border-radius: var(--radio-chico);
