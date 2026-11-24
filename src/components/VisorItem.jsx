@@ -161,7 +161,6 @@ function MiEntrega({ tareaId, onCambio }) {
       setDatos((x) => ({ ...x, ...hecho }));
       onCambio?.(true);
       setElegido(null);
-      setComentario('');
       avisar(entrega ? 'Entrega reemplazada.' : 'Trabajo entregado.');
     } catch (e) {
       setError(e.message);
