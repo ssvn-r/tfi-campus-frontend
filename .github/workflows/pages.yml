@@ -1,0 +1,71 @@
+# Compila el campus y lo publica en GitHub Pages en cada push a main.
+#
+# Pages no compila nada: sirve archivos. Publicar la rama tal cual dejaba la
+# pantalla en blanco, porque el navegador recibía /src/main.jsx sin compilar.
+#
+# Las variables VITE_ se meten en el paquete al compilar, así que tienen que
+# estar acá y no en el navegador:
+#   - Settings → Secrets and variables → Actions → Secrets: VITE_FIREBASE_*
+#   - Settings → Secrets and variables → Actions → Variables: VITE_API_URL
+#     (el dominio del backend en Render, sin /api al final)
+name: Publicar en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Compilar
+        run: npm run build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+
+      # Pages no sabe que /modulos/3 es una pantalla de React y devuelve 404
+      # al recargar. Con el index.html como 404.html, la aplicación arranca
+      # igual y React Router muestra la pantalla que corresponde.
+      - name: Recargar cualquier pantalla sin 404
+        run: cp dist/index.html dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publicar:
+    needs: compilar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacion.outputs.page_url }}
+    steps:
+      - id: publicacion
+        uses: actions/deploy-pages@v4

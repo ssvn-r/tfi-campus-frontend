@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  // En GitHub Pages el sitio se sirve desde /tfi-campus-frontend/, no desde
+  // la raíz del dominio. El workflow de publicación define BASE_PATH; en
+  // desarrollo queda en "/".
+  base: process.env.BASE_PATH || '/',
   server: {
     port: 5173,
     // Las peticiones a /api se redirigen al backend
