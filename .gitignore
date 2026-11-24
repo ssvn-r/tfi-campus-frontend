@@ -1,0 +1,30 @@
+# --- Dependencias y compilados ---
+node_modules/
+dist/
+build/
+
+# --- Variables de entorno: las claves de Firebase van en .env.local ---
+.env
+.env.local
+.env.*.local
+.env.*
+!.env.example
+
+# --- Editores y sistemas operativos ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Registros y temporales ---
+*.log
+npm-debug.log*
+.cache/
+.vercel/
+.netlify/
+
+# --- Herramientas de asistencia ---
+CLAUDE.md
+.claude/
